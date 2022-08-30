@@ -1,9 +1,9 @@
 // Get data in the API link
-const phoneData = async (search) => {
+const phoneData = async (search, dataLimit) => {
     const url = (`https://openapi.programming-hero.com/api/phones?search=${search}`);
     const res = await fetch(url);
     const data = await res.json();
-    displayPhoneData(data.data);
+    displayPhoneData(data.data, dataLimit);
 }
 
 // const phoneData = () => {
@@ -14,11 +14,20 @@ const phoneData = async (search) => {
 //     .catch(error => console.log(error))
 // }
 
-// display data inside the function
-const displayPhoneData = (phones) => {
+// display phone data inside the function
+const displayPhoneData = (phones, dataLimit) => {
     const phoneContainer = document.getElementById('phone-container');
     phoneContainer.innerHTML = "";
-    phones = phones.slice(0, 10)
+
+    const showAllContainer = document.getElementById('show-all-container')
+    if (dataLimit && phones.length > 10) {
+        phones = phones.slice(0, 10);
+        showAllContainer.classList.remove('d-none')
+    }
+    else{
+        showAllContainer.classList.add('d-none')
+    }
+
     //no phone massage
     const noFoundMassage = document.getElementById('no-found-massage');
     if (phones.length === 0) {
@@ -48,27 +57,39 @@ const displayPhoneData = (phones) => {
     togglerSpinner(false);
 }
 
-// search phone
-const searchPhone = () => {
+// common function for search and show all button
+const processSearch = (dataLimit) => {
     // start loader spinner
     togglerSpinner(true);
-
     const searchInput = document.getElementById('search-field');
     const searchInputValue = searchInput.value;
     searchInput.value = "";
-    phoneData(searchInputValue);
+    phoneData(searchInputValue, dataLimit);
 }
+
+// handle search button click
+document.getElementById('search-button').addEventListener('click', function(){
+    processSearch(10);
+})
+/* const searchPhone = () => {
+    processSearch(10);
+} */
 
 // spinner loader
 const togglerSpinner = (isLoading) => {
     const loaderSection = document.getElementById('spinner-loader');
-    if(isLoading){
+    if (isLoading) {
         loaderSection.classList.remove('d-none')
     }
-    else{
+    else {
         loaderSection.classList.add('d-none')
     }
 }
+
+// show all button click handler 
+document.getElementById('show-all-button').addEventListener('click', function(){
+    processSearch();
+})
 
 
 phoneData('iphone');
